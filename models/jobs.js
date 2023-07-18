@@ -74,7 +74,7 @@ const jobSchema = new mongoose.Schema({
       message: "Please select correct options for education",
     },
   },
-  position: {
+  positions: {
     type: Number,
     default: 1,
   },
