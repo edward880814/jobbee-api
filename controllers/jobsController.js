@@ -46,6 +46,25 @@ exports.updateJob = async (req, res, next) => {
   });
 };
 
+//Delete a Job => /api/v1/job/:id
+exports.deleteJob = async (req, res, next) => {
+  let job = await Job.findById(req.params.id);
+
+  if (!job) {
+    return res.status(404).json({
+      success: false,
+      message: "Job not found.",
+    });
+  }
+
+  job = await Job.findByIdAndDelete(req.params.id);
+
+  res.status(200).json({
+    success: true,
+    message: "Job is deleted.",
+  });
+};
+
 //Search jobs with radius => /api/v1/jobs/:zipcode/:distance
 exports.getJobsInRadius = async (req, res, next) => {
   const { zipcode, distance } = req.params;
@@ -55,7 +74,7 @@ exports.getJobsInRadius = async (req, res, next) => {
   const latitude = loc[0].latitude;
   const longitude = loc[0].longitude;
 
-  //簡化方法，將距離除以地球半徑
+  //simple method to calculate radius
   const radius = distance / 3963;
 
   const jobs = await Job.find({
