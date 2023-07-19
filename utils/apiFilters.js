@@ -7,6 +7,11 @@ class APIFilters {
   filter() {
     const queryCopy = { ...this.queryStr };
 
+    //Removing fields from the query
+    const removeFields = ["sort"];
+    removeFields.forEach((el) => delete queryCopy[el]);
+
+    console.log(queryCopy);
     //Advance filter using: lt, lte, gt, gte，正則表達式
     let queryStr = JSON.stringify(queryCopy);
     queryStr = queryStr.replace(
@@ -14,6 +19,17 @@ class APIFilters {
       (match) => `$${match}`
     );
     this.query = this.query.find(JSON.parse(queryStr));
+    return this;
+  }
+
+  sort() {
+    if (this.queryStr.sort) {
+      const sortBy = this.queryStr.sort.split(",").join(" ");
+      this.query = this.query.sort(sortBy);
+    } else {
+      this.query = this.query.sort("-postingDate");
+    }
+
     return this;
   }
 }
