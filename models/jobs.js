@@ -6,7 +6,7 @@ const geoCoder = require("../utils/geocoder");
 const jobSchema = new mongoose.Schema({
   title: {
     type: String,
-    require: [true, "Please enter Job title."],
+    required: [true, "Please enter Job title."],
     trim: true,
     maxlength: [100, "Job title can not exceed 100 characters."],
   },
