@@ -8,7 +8,7 @@ class APIFilters {
     const queryCopy = { ...this.queryStr };
 
     //Removing fields from the query
-    const removeFields = ["sort", "fields"];
+    const removeFields = ["sort", "fields", "q", "limit", "page"];
     removeFields.forEach((el) => delete queryCopy[el]);
 
     //Advance filter using: lt, lte, gt, gte，正則表達式
@@ -39,6 +39,26 @@ class APIFilters {
     } else {
       this.query = this.query.select("-__v");
     }
+    return this;
+  }
+
+  searchByQuery() {
+    if (this.queryStr.q) {
+      const qu = this.queryStr.q.split("-").join(" ");
+      //note \"的意思是將"轉換成一個字符
+      this.query = this.query.find({ $text: { $search: '"' + qu + '"' } });
+    }
+
+    return this;
+  }
+
+  pagination() {
+    const page = parseInt(this.queryStr.page, 10) || 1;
+    const limit = parseInt(this.queryStr.limit, 10) || 10;
+    const skipResults = (page - 1) * limit;
+
+    this.query = this.query.skip(skipResults).limit(limit);
+
     return this;
   }
 }
