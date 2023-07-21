@@ -1,7 +1,9 @@
 const User = require("../models/users");
+const Job = require("../models/jobs");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const ErrorHandler = require("../utils/errorHandler");
 const sendToken = require("../utils/jwtToken");
+const fs = require("fs");
 
 // Get current user profile => /api/v1/me
 exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
@@ -53,6 +55,8 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
 
 //Delete current user => /api/v1/me/delete
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
+  deleteUserData(req.user.id, req.user.role);
+
   const user = await User.findByIdAndDelete(req.user.id);
 
   res.cookie("token", "none", {
@@ -65,3 +69,35 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
     message: "Your account has been deleted.",
   });
 });
+
+// Delete user files and employeer jobs
+async function deleteUserData(user, role) {
+  if (role === "employer") {
+    await Job.deleteMany({ user: user });
+  }
+
+  if (role === "user") {
+    const appliedJobs = await Job.find({ "applicantsApplied.id": user }).select(
+      "+applicantsApplied"
+    );
+
+    for (let i = 0; i < appliedJobs.length; i++) {
+      let obj = appliedJobs[i].applicantsApplied.find((o) => o.id === user);
+
+      let filepath = `${__dirname}/public/uploads/${obj.resume}`.replace(
+        "\\controllers",
+        ""
+      );
+
+      fs.unlink(filepath, (err) => {
+        if (err) return console.log(err);
+      });
+
+      appliedJobs[i].applicantsApplied.splice(
+        appliedJobs[i].applicantsApplied.indexOf(obj.id)
+      );
+
+      await appliedJobs[i].save();
+    }
+  }
+}
