@@ -4,6 +4,7 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const ErrorHandler = require("../utils/errorHandler");
 const sendToken = require("../utils/jwtToken");
 const fs = require("fs");
+const APIFilters = require("../utils/apiFilters");
 
 // Get current user profile => /api/v1/me
 exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
@@ -91,6 +92,25 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Your account has been deleted.",
+  });
+});
+
+// Adding controller methods that only accessible by admins
+
+// Show all user => /api/v1/users
+exports.getUsers = catchAsyncErrors(async (req, res, next) => {
+  const apiFilters = new APIFilters(User.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .pagination();
+
+  const users = await apiFilters.query;
+
+  res.status(200).json({
+    success: true,
+    results: users.length,
+    data: users,
   });
 });
 
