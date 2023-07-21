@@ -42,6 +42,9 @@ exports.newJob = catchAsyncErrors(async (req, res, next) => {
 exports.getJob = catchAsyncErrors(async (req, res, next) => {
   const job = await Job.find({
     $and: [{ _id: req.params.id }, { slug: req.params.slug }],
+  }).populate({
+    path: "user",
+    select: "name",
   });
 
   if (!job || job.length === 0) {

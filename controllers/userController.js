@@ -114,6 +114,25 @@ exports.getUsers = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Delete User(Admin) => /api/v1/user/:id
+exports.deleteUserAdmin = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  console.log(user);
+  if (!user) {
+    return next(
+      new ErrorHandler(`User not found with id: ${req.params.id}`, 404)
+    );
+  }
+
+  deleteUserData(user.id, user.role);
+  await user.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    message: "User is deleted by Admin.",
+  });
+});
+
 // Delete user files and employer jobs
 async function deleteUserData(user, role) {
   if (role === "employer") {
