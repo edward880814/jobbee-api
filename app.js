@@ -4,6 +4,7 @@ const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
+const rateLimit = require("express-rate-limit");
 
 const connectDatabase = require("./config/database");
 const errorMiddleware = require("./middlewares/errors");
@@ -30,6 +31,14 @@ app.use(cookieParser());
 
 // Handle file uploads
 app.use(fileUpload());
+
+//Rate Limiting
+const limiter = rateLimit({
+  windowsMs: 10 * 60 * 1000,
+  max: 100,
+});
+
+app.use(limiter);
 
 //Importing all routes
 const jobs = require("./routes/jobs");
