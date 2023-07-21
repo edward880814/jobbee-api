@@ -6,10 +6,14 @@ const {
   updatePassword,
   updateUser,
   deleteUser,
+  getAppliedJobs,
 } = require("../controllers/userController");
-const { isAuthenticatedUser } = require("../middlewares/auth");
+const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 
 router.route("/me").get(isAuthenticatedUser, getUserProfile);
+router
+  .route("/jobs/applied")
+  .get(isAuthenticatedUser, authorizeRoles("user"), getAppliedJobs);
 
 router.route("/password/update").put(isAuthenticatedUser, updatePassword);
 

@@ -53,6 +53,19 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//Show all applied jobs => /api/v1/jobs/applied
+exports.getAppliedJobs = catchAsyncErrors(async (req, res, next) => {
+  const jobs = await Job.find({ "applicantsApplied.id": req.user.id }).select(
+    "+applicantsApplied"
+  );
+
+  res.status(200).json({
+    success: true,
+    results: jobs.length,
+    data: jobs,
+  });
+});
+
 //Delete current user => /api/v1/me/delete
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   deleteUserData(req.user.id, req.user.role);
@@ -70,7 +83,7 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Delete user files and employeer jobs
+// Delete user files and employer jobs
 async function deleteUserData(user, role) {
   if (role === "employer") {
     await Job.deleteMany({ user: user });
