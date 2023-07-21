@@ -66,6 +66,17 @@ exports.getAppliedJobs = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Show all jobs published by employer => /api/v1/jobs/published
+exports.getPublishedJobs = catchAsyncErrors(async (req, res, next) => {
+  const jobs = await Job.find({ user: req.user.id });
+
+  res.status(200).json({
+    success: true,
+    results: jobs.length,
+    data: jobs,
+  });
+});
+
 //Delete current user => /api/v1/me/delete
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   deleteUserData(req.user.id, req.user.role);
