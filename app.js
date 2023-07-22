@@ -8,6 +8,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xssClean = require("xss-clean");
+const hpp = require("hpp");
 
 const connectDatabase = require("./config/database");
 const errorMiddleware = require("./middlewares/errors");
@@ -43,6 +44,13 @@ app.use(mongoSanitize());
 
 // Prevent XSS attacks
 app.use(xssClean());
+
+// Prevent Parameter Pollution
+app.use(
+  hpp({
+    whitelist: ["positions"],
+  })
+);
 
 //Rate Limiting
 const limiter = rateLimit({
