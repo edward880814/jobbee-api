@@ -4,7 +4,7 @@
   "description": "this api is about jobs",
   "main": "app.js",
   "scripts": {
-    "start": "SET NODE_ENV=production&& node app.js",
+    "start": "export NODE_ENV=production && node app.js",
     "dev": "nodemon app.js"
   },
   "author": "Edward Kuan",
